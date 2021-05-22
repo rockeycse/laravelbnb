@@ -20,7 +20,7 @@
     </div>
   </div>
 </template>
-
+  
 
 <script>
 import BookableListItem from "./BookableListItem.vue";
