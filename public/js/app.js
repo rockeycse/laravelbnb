@@ -1967,7 +1967,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     itemTitle: String,
-    itemContent: String,
+    itemDescription: String,
     price: Number
   }
 });
@@ -1984,6 +1984,10 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BookableListItem_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BookableListItem.vue */ "./resources/js/bookables/BookableListItem.vue");
+//
+//
+//
+//
 //
 //
 //
@@ -2036,43 +2040,25 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     var _this = this;
 
-    this.loading = true;
-    setTimeout(function () {
-      _this.bookables = [{
-        id: 1,
-        title: "Cheap Villa !!!",
-        content: "A very cheap Villa"
-      }, {
-        id: 2,
-        title: "Cheap Villa 2",
-        content: "A very cheap Villa 2"
-      }, {
-        id: 3,
-        title: "Cheap Villa 3",
-        content: "A very cheap Villa 3"
-      }, {
-        id: 4,
-        title: "Cheap Villa 4",
-        content: "A very cheap Villa 4"
-      }, {
-        id: 5,
-        title: "Cheap Villa 5",
-        content: "A very cheap Villa 5"
-      }, {
-        id: 6,
-        title: "Cheap Villa 6",
-        content: "A very cheap Villa 6"
-      }, {
-        id: 7,
-        title: "Cheap Villa 7",
-        content: "A very cheap Villa 7"
-      }, {
-        id: 8,
-        title: "Cheap Villa 8",
-        content: "A very cheap Villa 8"
-      }];
+    this.loading = true; // const p = new Promise((resolve, reject) => {
+    //   console.log(resolve);
+    //   console.log(reject);
+    //   setTimeout(() => resolve("Hello"), 3000);
+    // })
+    //   .then((result) => "Hello Again " + result)
+    //   .then((result) => console.log(result))
+    //   .catch((result) => console.log(`Error ${result}`));
+    // console.log(p);
+
+    var request = axios.get("/api/bookables").then(function (response) {
+      _this.bookables = response.data;
       _this.loading = false;
-    }, 2000);
+
+      _this.bookables.push({
+        title: "x",
+        description: "x"
+      });
+    });
   }
 });
 
@@ -37828,11 +37814,13 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card" }, [
+  return _c("div", { staticClass: "card w-100" }, [
     _c("div", { staticClass: "card-body" }, [
       _c("h5", { staticClass: "card-title" }, [_vm._v(_vm._s(_vm.itemTitle))]),
       _vm._v(" "),
-      _c("p", { staticClass: "card-text" }, [_vm._v(_vm._s(_vm.itemContent))]),
+      _c("p", { staticClass: "card-text" }, [
+        _vm._v(_vm._s(_vm.itemDescription))
+      ]),
       _vm._v(" "),
       _c("p", { staticClass: "card-text" }, [_vm._v(_vm._s(_vm.price))])
     ])
@@ -37874,12 +37862,15 @@ var render = function() {
                 _vm._l(_vm.bookablesInRow(row), function(bookable, column) {
                   return _c(
                     "div",
-                    { key: "row" + row + column, staticClass: "col" },
+                    {
+                      key: "row" + row + column,
+                      staticClass: "col d-flex align-items-stretch"
+                    },
                     [
                       _c("bookable-list-item", {
                         attrs: {
                           "item-title": bookable.title,
-                          "item-content": bookable.content,
+                          "item-description": bookable.description,
                           price: 1000
                         }
                       })
