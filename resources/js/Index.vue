@@ -4,8 +4,8 @@
       <router-link class="navbar-brand mr-auto" :to="{ name: 'home' }"
         >Home</router-link
       >
-      <router-link class="btn nav-button" :to="{ name: 'second' }"
-        >Second Route</router-link
+      <router-link class="btn nav-button" :to="{ name: 'bookable' }"
+        >Bookable</router-link
       >
     </nav>
 

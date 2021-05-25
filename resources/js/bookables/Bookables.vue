@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    Rows is : {{ rows }}
-    <div v-if="loading">Data is loading...</div>
+    <!-- Rows is : {{ rows }} -->
+    <div v-if="loading"><h1>Data is loading...</h1></div>
     <div v-else>
       <div class="row mb-4" v-for="row in rows" :key="'row' + row">
         <div
@@ -10,9 +10,8 @@
           :key="'row' + row + column"
         >
           <bookable-list-item
-            :item-title="bookable.title"
-            :item-description="bookable.description"
-            :price="1000"
+
+            v-bind="bookable"
           ></bookable-list-item>
         </div>
         <div
@@ -67,7 +66,7 @@ export default {
     //   .catch((result) => console.log(`Error ${result}`));
 
     // console.log(p);
-    const request = axios.get("/api/bookables").then((response) => {
+    const request = axios.get(`/api/bookables`).then((response) => {
       this.bookables = response.data;
       this.loading = false;
     });
