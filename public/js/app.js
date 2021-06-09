@@ -2162,7 +2162,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -2321,7 +2320,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    rating: Number
+  },
+  computed: {
+    halfStar: function halfStar() {
+      var fraction = Math.round((this.rating - Math.floor(this.rating)) * 100); //   console.log(fraction);
+
+      return fraction > 0 && fraction < 50;
+    },
+    fullStar: function fullStar() {
+      return Math.round(this.rating);
+    },
+    emptyStars: function emptyStars() {
+      return 5 - Math.ceil(this.rating);
+    }
+  }
+});
 
 /***/ }),
 
@@ -60496,10 +60515,10 @@ var render = function() {
                     "div",
                     { staticClass: "col-md-6 d-flex justify-content-end" },
                     [
-                      _vm._v(
-                        "\n          " + _vm._s(review.rating) + "\n          "
-                      ),
-                      _c("star-rating")
+                      _c("star-rating", {
+                        staticClass: "fa-lg",
+                        attrs: { rating: review.rating }
+                      })
                     ],
                     1
                   )
@@ -60651,7 +60670,24 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("\n    hello\n")])
+  return _c(
+    "div",
+    { staticClass: "d-flex" },
+    [
+      _vm._l(_vm.fullStar, function(star) {
+        return _c("i", { key: "full" + star, staticClass: "fas fa-star" })
+      }),
+      _vm._v(" "),
+      _vm.halfStar
+        ? _c("i", { staticClass: "fas fa-star-half-alt" })
+        : _vm._e(),
+      _vm._v(" "),
+      _vm._l(_vm.emptyStars, function(star) {
+        return _c("i", { key: "empty" + star, staticClass: "far fa-star" })
+      })
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
