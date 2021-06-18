@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
+    protected $fillable = ['id', 'content', 'rating'];
+
     public function bookable()
     {
         return $this->belongsTo(Bookable::class);
