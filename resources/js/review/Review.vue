@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class="row" v-if="error">
-      Unknown error has occured, please try again later!
-    </div>
+    <fatal-error v-if="error"></fatal-error>
     <div class="row" v-else>
       <div :class="[{ 'col-md-4': twoColumns }, { 'd-none': oneColumn }]">
         <div class="card">
@@ -48,12 +46,20 @@
                 rows="10"
                 class="form-control"
                 v-model="review.content"
+                :class="[{ 'is-invalid': errorFor('content') }]"
               ></textarea>
+              <div
+                class="invalid-feedback"
+                v-for="(error, index) in errorFor('content')"
+                :key="'content' + index"
+              >
+                {{ error }}
+              </div>
             </div>
             <button
               class="btn btn-lg- btn-primary btn-block"
               @click.prevent="submit"
-              :disabled="loading"
+              :disabled="sending"
             >
               Submit
             </button>
@@ -65,7 +71,7 @@
 </template>
 
 <script>
-import { is404 } from "./../shared/utilities/response";
+import { is404, is422 } from "./../shared/utilities/response";
 
 export default {
   data() {
@@ -79,19 +85,31 @@ export default {
       loading: false,
       booking: null,
       error: false,
+      errors: null,
+      sending: null,
     };
   },
   methods: {
     submit() {
-      this.loading = true;
+      this.errors = null;
+      this.sending = true;
       axios
         .post(`/api/reviews`, this.review)
         .then((response) => console.log(response))
-        .catch((err) => (this.error = true))
-        .then(() => (this.loading = false));
+        .catch((err) => {
+          if (is422(err)) {
+            const errors = err.response.data.errors;
+            if (erros["content"] && 1 == _.size(errors)) {
+              this.errors = errors;
+              return;
+            }
+          }
+          this.error = true;
+        })
+        .then(() => (this.sending = false));  
     },
-    onRatingChanged(rating) {
-      console.log(rating);
+    errorFor(field) {
+      return null != this.errors && this.errors[field] ? this.errors[field] : null;
     },
   },
   created() {
@@ -102,7 +120,6 @@ export default {
       .get(`/api/reviews/${this.review.id}`)
       .then((response) => {
         this.existingReview = response.data.data;
-        // console.log(response.data.data);
       })
       .catch((err) => {
         if (is404(err)) {
@@ -112,33 +129,22 @@ export default {
               this.booking = response.data.data;
             })
             .catch((err) => {
-              // is404(err) ? {} : (this.error = true);
               this.error = !is404(err);
-              // console.log("2nd " + !is404(err));
-              // if (!is404(err)) {
-              //   this.error = true;
-              // }
             });
         }
-        // this.error = true;
       })
       .then(() => {
-        // console.log(this.booking.booking_id);
-        // console.log(response);
         this.loading = false;
       });
   },
   computed: {
     alreadyReviewed() {
       return this.hasReview || !this.booking;
-      // return false;
     },
     hasReview() {
-      //console.log("existingReview " +this.existingReview);
       return this.existingReview != null;
     },
     hasBooking() {
-      // console.log("has booking "+this.booking);
       return this.booking != null;
     },
     oneColumn() {
