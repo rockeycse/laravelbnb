@@ -1,7 +1,10 @@
 <template>
   <div>
+    <success v-if="success">
+      You left a review, Thank you very much!
+    </success>
     <fatal-error v-if="error"></fatal-error>
-    <div class="row" v-else>
+    <div class="row" v-if="!success && !error">
       <div :class="[{ 'col-md-4': twoColumns }, { 'd-none': oneColumn }]">
         <div class="card">
           <div class="card-body">
@@ -48,13 +51,7 @@
                 v-model="review.content"
                 :class="[{ 'is-invalid': errorFor('content') }]"
               ></textarea>
-              <div
-                class="invalid-feedback"
-                v-for="(error, index) in errorFor('content')"
-                :key="'content' + index"
-              >
-                {{ error }}
-              </div>
+              <v-errors :errors="errorFor('content')"></v-errors>
             </div>
             <button
               class="btn btn-lg- btn-primary btn-block"
@@ -72,8 +69,12 @@
 
 <script>
 import { is404, is422 } from "./../shared/utilities/response";
+import validationErrors from "./../shared/mixins/validationErrors";
+import Success from '../shared/components/Success.vue';
 
 export default {
+  components: { Success },
+  mixins: [validationErrors],
   data() {
     return {
       review: {
@@ -85,57 +86,58 @@ export default {
       loading: false,
       booking: null,
       error: false,
-      errors: null,
       sending: null,
+      success: false,
     };
   },
   methods: {
     submit() {
       this.errors = null;
       this.sending = true;
+      this.success = false;
+
       axios
         .post(`/api/reviews`, this.review)
-        .then((response) => console.log(response))
+        .then(response => {
+          this.success = 201 == response.status;
+        })
         .catch((err) => {
           if (is422(err)) {
             const errors = err.response.data.errors;
-            if (erros["content"] && 1 == _.size(errors)) {
+            if (errors["content"] && 1 == _.size(errors)) {
               this.errors = errors;
               return;
             }
           }
           this.error = true;
         })
-        .then(() => (this.sending = false));  
-    },
-    errorFor(field) {
-      return null != this.errors && this.errors[field] ? this.errors[field] : null;
+        .then(() => (this.sending = false));
     },
   },
-  created() {
+  async created() {
     this.review.id = this.$route.params.id;
     this.loading = true;
 
-    axios
-      .get(`/api/reviews/${this.review.id}`)
-      .then((response) => {
-        this.existingReview = response.data.data;
-      })
-      .catch((err) => {
-        if (is404(err)) {
-          return axios
-            .get(`/api/booking-by-review/${this.review.id}`)
-            .then((response) => {
-              this.booking = response.data.data;
-            })
-            .catch((err) => {
-              this.error = !is404(err);
-            });
+    try {
+      this.existingReview = (
+        await axios.get(`/api/reviews/${this.review.id}`)
+      ).data.data;
+    } catch (err) {
+      if (is404(err)) {
+        try {
+          this.booking = (
+            await axios.get(`/api/booking-by-review/${this.review.id}`)
+          ).data.data;
+        } catch (err) {
+          this.error = !is404(err);
         }
-      })
-      .then(() => {
-        this.loading = false;
-      });
+      } else {
+        this.error = true;
+      }
+    }
+
+    this.loading = false;
+
   },
   computed: {
     alreadyReviewed() {
