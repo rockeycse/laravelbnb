@@ -1,8 +1,6 @@
 <template>
   <div>
-    <success v-if="success">
-      You left a review, Thank you very much!
-    </success>
+    <success v-if="success"> You left a review, Thank you very much! </success>
     <fatal-error v-if="error"></fatal-error>
     <div class="row" v-if="!success && !error">
       <div :class="[{ 'col-md-4': twoColumns }, { 'd-none': oneColumn }]">
@@ -70,7 +68,7 @@
 <script>
 import { is404, is422 } from "./../shared/utilities/response";
 import validationErrors from "./../shared/mixins/validationErrors";
-import Success from '../shared/components/Success.vue';
+import Success from "../shared/components/Success.vue";
 
 export default {
   components: { Success },
@@ -98,7 +96,7 @@ export default {
 
       axios
         .post(`/api/reviews`, this.review)
-        .then(response => {
+        .then((response) => {
           this.success = 201 == response.status;
         })
         .catch((err) => {
@@ -137,7 +135,6 @@ export default {
     }
 
     this.loading = false;
-
   },
   computed: {
     alreadyReviewed() {
